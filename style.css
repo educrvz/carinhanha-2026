@@ -72,7 +72,7 @@ html, body { height: 100%; overflow: hidden; font-family: -apple-system, system-
 .layer-btn.active { background: rgba(40, 120, 255, 0.9); }
 
 #layer-column {
-  position: fixed; top: 88px; left: 6px; z-index: 1000;
+  position: fixed; top: 88px; left: 72px; z-index: 1000;
   display: flex; flex-direction: column; gap: 4px;
 }
 
@@ -90,6 +90,7 @@ html, body { height: 100%; overflow: hidden; font-family: -apple-system, system-
 }
 #notes-btn { position: relative !important; }
 #notes-count {
+  display: none;
   position: absolute; right: -3px; top: -3px; min-width: 17px; height: 17px;
   padding: 0 4px; border-radius: 9px; background: #ffcb3d; color: #15152a;
   font: 800 10px/17px -apple-system, system-ui, sans-serif;
@@ -173,5 +174,5 @@ html, body { height: 100%; overflow: hidden; font-family: -apple-system, system-
   filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8));
 }
 
-.leaflet-control-zoom { margin-top: 70px !important; }
+.leaflet-control-zoom { margin-top: 76px !important; margin-left: 12px !important; }
 .leaflet-control-attribution { display: none !important; }

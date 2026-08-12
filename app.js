@@ -278,7 +278,9 @@ function renderSavedNotes() {
     }),
     zIndexOffset: 800
   }).addTo(map).on('click', () => showNoteDetails(note.id)));
-  document.getElementById('notes-count').textContent = savedNotes.length;
+  const notesCount = document.getElementById('notes-count');
+  notesCount.textContent = savedNotes.length;
+  notesCount.style.display = savedNotes.length ? 'block' : 'none';
 }
 
 function setupNoteCreation() {
