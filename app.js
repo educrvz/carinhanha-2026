@@ -5,7 +5,9 @@ const ALL_POIS = [
   ...(ROUTE_DATA.pois || []),
   ...(typeof SHEET_POIS === 'undefined' ? [] : SHEET_POIS)
 ];
-let controlPointLayers = [];
+let showAllKm = false;
+let kmLabelLayers = [];
+let kmDotLayers = [];
 let savedNotes = [];
 let noteLayers = [];
 let speedSamples = [];
@@ -75,7 +77,7 @@ function initMap() {
     ).addTo(map);
   }
 
-  addControlPoints();
+  addKmMarkers();
   addPOIs();
   loadSavedNotes();
   setupNoteCreation();
@@ -84,29 +86,46 @@ function initMap() {
   map.setView(routeCoords[mid], 13);
 }
 
-function addControlPoints() {
-  controlPointLayers.forEach(layer => map.removeLayer(layer));
-  controlPointLayers = [];
+function addKmMarkers() {
+  kmLabelLayers.forEach(layer => map.removeLayer(layer));
+  kmDotLayers.forEach(layer => map.removeLayer(layer));
+  kmLabelLayers = [];
+  kmDotLayers = [];
 
-  (ROUTE_DATA.controlPoints || []).forEach(point => {
-    const marker = L.marker([point.lat, point.lon], {
-      icon: L.divIcon({
-        className: 'control-point-marker',
-        html: `<span>${point.id}</span>`,
-        iconSize: [44, 22],
-        iconAnchor: [8, 11]
-      }),
-      zIndexOffset: 500
-    }).on('click', () => {
-      showInfo(
-        `<h3>📍 Ponto ${point.id}</h3>` +
-        `<p>Km ${point.km.toFixed(2)}</p>` +
-        `<p>${point.lat.toFixed(7)}, ${point.lon.toFixed(7)}</p>`
-      );
+  ROUTE_DATA.kmMarkers.forEach(marker => {
+    const isStart = marker.km === 0;
+    const isEnd = Math.abs(marker.km - TOTAL_KM) < 0.01;
+    const isMajor = marker.km % 10 === 0;
+    const isMinor = marker.km % 5 === 0;
+    const showLabel = showAllKm || isStart || isEnd || isMajor;
+
+    if (showLabel) {
+      const label = isStart ? 'INÍCIO' : isEnd ? 'FIM' : `${marker.km} km`;
+      const layer = L.marker([marker.lat, marker.lon], {
+        icon: L.divIcon({
+          className: 'km-marker-label',
+          html: `<span style="font-size:${showAllKm && !isMajor ? 10 : 13}px">${label}</span>`,
+          iconSize: [60, 16], iconAnchor: [30, 8]
+        })
+      }).addTo(map);
+      kmLabelLayers.push(layer);
+    }
+
+    const dot = L.circleMarker([marker.lat, marker.lon], {
+      radius: isMajor ? 4 : isMinor ? 2.5 : 1.5,
+      fillColor: '#fff', fillOpacity: isMajor ? 0.9 : isMinor ? 0.6 : 0.3,
+      color: '#fff', weight: 0.5, opacity: isMajor ? 0.9 : isMinor ? 0.6 : 0.3
+    }).addTo(map).on('click', () => {
+      showInfo(`<h3>Km ${marker.km}</h3><p>Restam ${(TOTAL_KM - marker.km).toFixed(1)} km</p>`);
     });
-    marker.addTo(map);
-    controlPointLayers.push(marker);
+    kmDotLayers.push(dot);
   });
+}
+
+function toggleKmDetail() {
+  showAllKm = !showAllKm;
+  document.getElementById('km-toggle-btn').classList.toggle('active', showAllKm);
+  addKmMarkers();
 }
 
 const poiLayers = {};

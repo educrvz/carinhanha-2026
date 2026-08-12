@@ -122,23 +122,19 @@ html, body { height: 100%; overflow: hidden; font-family: -apple-system, system-
   border-radius: 9px; border-left: 3px solid #ffcb3d;
 }
 
+.km-marker-label {
+  background: none !important; border: none !important; box-shadow: none !important;
+  color: #fff; font-size: 11px; font-weight: 700;
+  text-shadow: 0 0 4px #000, 0 0 4px #000, 0 0 2px #000;
+  white-space: nowrap;
+}
+
 #coords-display {
   position: fixed; bottom: 16px; left: 16px; z-index: 1000;
   background: rgba(26, 26, 46, 0.85); color: #aaa;
   padding: 6px 10px; border-radius: 6px; font-size: 11px;
   font-family: monospace; backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-}
-
-.control-point-marker {
-  background: none !important; border: none !important;
-}
-.control-point-marker span {
-  display: inline-block; min-width: 28px; padding: 2px 5px;
-  background: #1976d2; color: #fff; border: 2px solid #fff;
-  border-radius: 12px; font-size: 11px; font-weight: 700;
-  line-height: 14px; text-align: center; white-space: nowrap;
-  box-shadow: 0 1px 5px rgba(0,0,0,0.7);
 }
 
 #map-attribution {
