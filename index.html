@@ -31,8 +31,15 @@
 
 <div id="top-bar">
   <div id="km-display">-- km</div>
-  <div id="remaining-display">Restam -- km</div>
+  <div id="trip-metrics">
+    <div id="remaining-display">Restam -- km</div>
+    <div id="speed-display">-- km/h</div>
+  </div>
 </div>
+
+<button id="compass-btn" class="map-btn" type="button" onclick="enableCompass()" aria-label="Ativar bússola">
+  <span id="compass-needle" aria-hidden="true"><b>N</b><i></i></span>
+</button>
 
 <div id="gps-btn" class="map-btn" onclick="toggleGPS()">
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -53,6 +60,10 @@
   <div id="points-toggle-btn" class="map-btn layer-btn active" onclick="toggleControlPoints()">
     <span style="font-size:10px; font-weight:700; line-height:1">PTS</span>
   </div>
+  <button id="notes-btn" class="map-btn layer-btn" type="button" onclick="showSavedNotes()" aria-label="Ver e exportar anotações">
+    <span style="font-size:20px; line-height:1">📝</span>
+    <small id="notes-count">0</small>
+  </button>
   <div id="poi-toggle-btn" class="map-btn layer-btn" onclick="togglePOIDrawer()">
     <span style="line-height:1">📍</span>
   </div>
@@ -92,7 +103,7 @@
 
 <div id="info-panel" style="display:none">
   <div id="info-content"></div>
-  <button onclick="closeInfo()">Fechar</button>
+  <button id="info-close-btn" onclick="closeInfo()">Fechar</button>
 </div>
 
 <div id="coords-display" style="display:none"></div>

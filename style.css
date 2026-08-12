@@ -46,6 +46,8 @@ html, body { height: 100%; overflow: hidden; font-family: -apple-system, system-
 }
 #km-display { font-size: 22px; font-weight: 700; }
 #remaining-display { font-size: 15px; color: #aaa; }
+#trip-metrics { text-align: right; }
+#speed-display { color: #67d9ff; font-size: 13px; font-weight: 700; margin-top: 2px; }
 
 .map-btn {
   position: fixed; z-index: 1000; width: 48px; height: 48px;
@@ -61,6 +63,23 @@ html, body { height: 100%; overflow: hidden; font-family: -apple-system, system-
 
 #gps-btn { bottom: 100px; right: 16px; }
 #center-btn { bottom: 160px; right: 16px; }
+#compass-btn { top: 76px; right: 14px; width: 54px; height: 54px; }
+#compass-needle {
+  position: relative; width: 36px; height: 36px; display: block;
+  transition: transform 180ms ease-out;
+}
+#compass-needle b {
+  position: absolute; top: -3px; left: 50%; transform: translateX(-50%);
+  color: #ff5b5b; font-size: 12px; line-height: 1;
+}
+#compass-needle i {
+  position: absolute; left: 50%; top: 8px; width: 0; height: 0;
+  transform: translateX(-50%);
+  border-left: 6px solid transparent; border-right: 6px solid transparent;
+  border-bottom: 20px solid #ff5b5b;
+  filter: drop-shadow(0 1px 2px #000);
+}
+#compass-btn.compass-live { background: rgba(40, 120, 255, 0.9); }
 
 .layer-btn {
   position: relative !important;
@@ -85,6 +104,12 @@ html, body { height: 100%; overflow: hidden; font-family: -apple-system, system-
   width: 40px; height: 40px;
   font-size: 18px;
 }
+#notes-btn { position: relative !important; }
+#notes-count {
+  position: absolute; right: -3px; top: -3px; min-width: 17px; height: 17px;
+  padding: 0 4px; border-radius: 9px; background: #ffcb3d; color: #15152a;
+  font: 800 10px/17px -apple-system, system-ui, sans-serif;
+}
 
 #info-panel {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 1001;
@@ -95,10 +120,22 @@ html, body { height: 100%; overflow: hidden; font-family: -apple-system, system-
 }
 #info-panel h3 { font-size: 18px; margin-bottom: 8px; }
 #info-panel p { font-size: 14px; color: #ccc; margin: 4px 0; }
+#info-panel label { display: block; color: #aaa; font-size: 12px; margin: 12px 0 5px; }
+#info-panel textarea {
+  width: 100%; min-height: 92px; resize: vertical; padding: 12px;
+  border: 1px solid #555578; border-radius: 10px; background: #111124;
+  color: #fff; font: 16px/1.35 -apple-system, system-ui, sans-serif;
+}
 #info-panel button {
   margin-top: 12px; padding: 10px 24px; background: #4af; color: #000;
   border: none; border-radius: 8px; font-size: 16px; font-weight: 600;
   cursor: pointer; width: 100%;
+}
+#info-panel .secondary-action { background: #3a3a59; color: #fff; }
+#info-panel .danger-action { background: #8f2e39; color: #fff; }
+#info-panel .note-card {
+  margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.07);
+  border-radius: 9px; border-left: 3px solid #ffcb3d;
 }
 
 #coords-display {
@@ -156,6 +193,11 @@ html, body { height: 100%; overflow: hidden; font-family: -apple-system, system-
   background: none !important; border: none !important;
   font-size: 22px; text-align: center; line-height: 1;
   filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));
+}
+.user-note-marker {
+  background: none !important; border: none !important;
+  font-size: 24px; text-align: center; line-height: 1;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8));
 }
 
 .leaflet-control-zoom { margin-top: 70px !important; }
