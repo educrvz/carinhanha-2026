@@ -95,6 +95,7 @@ html, body { height: 100%; overflow: hidden; font-family: -apple-system, system-
   font-size: 18px;
 }
 #notes-btn { position: relative !important; }
+.leaflet-container.note-placement-active { cursor: crosshair; }
 #notes-count {
   display: none;
   position: absolute; right: -3px; top: -3px; min-width: 17px; height: 17px;

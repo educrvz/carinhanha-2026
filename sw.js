@@ -1,4 +1,4 @@
-const CACHE_NAME = 'carinhanha-v8';
+const CACHE_NAME = 'carinhanha-v9';
 
 const APP_SHELL = [
   './',

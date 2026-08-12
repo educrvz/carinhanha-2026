@@ -8,7 +8,8 @@ Mapa GPS offline (PWA) para a descida de canoa pelo Rio Carinhanha.
 - As imagens de satélite são baixadas para o aparelho na primeira abertura pelo Wi-Fi.
 - Pacote atual: 9.892 imagens, aproximadamente 163 MB.
 - Rota corrigida: 151,89 km, 1.421 vértices seguindo as curvas do rio.
-- Os 151 pontos do KML da equipe são preservados em suas coordenadas exatas e aparecem em azul no mapa.
+- Os 151 pontos do KML da equipe são preservados em suas coordenadas exatas para validação, mas seus IDs ficam ocultos no mapa para não serem confundidos com quilômetros.
+- Para criar anotações, ative o botão 📝, toque no mapa e desative o botão ao terminar. Pressionar ou arrastar o mapa com o modo desligado não cria pontos.
 
 ## Atualizar a rota
 

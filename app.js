@@ -10,6 +10,7 @@ let kmLabelLayers = [];
 let kmDotLayers = [];
 let savedNotes = [];
 let noteLayers = [];
+let noteCreationActive = false;
 let speedSamples = [];
 let lastNoteEditorOpenedAt = 0;
 let lastProgress = { loaded: 0, total: 0, timestamp: 0 };
@@ -284,34 +285,26 @@ function renderSavedNotes() {
 }
 
 function setupNoteCreation() {
-  let pressTimer = null;
-  let pressedAt = null;
-  const container = map.getContainer();
-
-  const cancelPress = () => {
-    if (pressTimer) clearTimeout(pressTimer);
-    pressTimer = null;
-    pressedAt = null;
-  };
-
-  L.DomEvent.on(container, 'touchstart', event => {
-    if (event.touches.length !== 1) return;
-    pressedAt = { x: event.touches[0].clientX, y: event.touches[0].clientY };
-    pressTimer = setTimeout(() => {
-      const point = map.mouseEventToContainerPoint({ clientX: pressedAt.x, clientY: pressedAt.y });
-      openNoteEditor(map.containerPointToLatLng(point));
-      if (navigator.vibrate) navigator.vibrate(35);
-      cancelPress();
-    }, 650);
+  map.on('click', event => {
+    if (noteCreationActive) openNoteEditor(event.latlng);
   });
-  L.DomEvent.on(container, 'touchmove', event => {
-    if (!pressedAt || event.touches.length !== 1) return;
-    const dx = event.touches[0].clientX - pressedAt.x;
-    const dy = event.touches[0].clientY - pressedAt.y;
-    if (Math.hypot(dx, dy) > 12) cancelPress();
-  });
-  L.DomEvent.on(container, 'touchend touchcancel', cancelPress);
-  map.on('contextmenu', event => openNoteEditor(event.latlng));
+}
+
+function toggleNoteCreation() {
+  noteCreationActive = !noteCreationActive;
+  const button = document.getElementById('notes-btn');
+  button.classList.toggle('active', noteCreationActive);
+  button.setAttribute(
+    'aria-label',
+    noteCreationActive ? 'Desativar criação de anotações' : 'Ativar criação de anotações'
+  );
+  map.getContainer().classList.toggle('note-placement-active', noteCreationActive);
+
+  if (noteCreationActive) {
+    closeInfo();
+  } else {
+    showSavedNotes();
+  }
 }
 
 function openNoteEditor(latlng) {
@@ -367,7 +360,7 @@ function deleteNote(id) {
 function showSavedNotes() {
   let html = '<h3>📝 Minhas anotações</h3>';
   if (savedNotes.length === 0) {
-    html += '<p>Pressione e segure qualquer ponto do mapa para criar uma anotação.</p>';
+    html += '<p>Nenhuma anotação salva.</p>';
   } else {
     savedNotes.forEach(note => {
       html += `<div class="note-card" onclick="focusNote('${note.id}')">`;
@@ -376,6 +369,7 @@ function showSavedNotes() {
     });
     html += '<button onclick="exportNotes()">Exportar arquivo</button>';
   }
+  html += '<p style="margin-top:10px">Para adicionar pontos, ative 📝 e toque no mapa. Toque em 📝 novamente quando terminar.</p>';
   html += '<p style="margin-top:10px">As anotações ficam somente neste aparelho até serem exportadas.</p>';
   showInfo(html);
 }
