@@ -4,6 +4,8 @@ const TOTAL_KM = ROUTE_DATA.totalKm;
 let showAllKm = false;
 let kmLabelLayers = [];
 let kmDotLayers = [];
+let controlPointLayers = [];
+let showControlPoints = true;
 let lastProgress = { loaded: 0, total: 0, timestamp: 0 };
 let stallTimer = null;
 
@@ -68,10 +70,45 @@ function initMap() {
   }
 
   addKmMarkers();
+  addControlPoints();
   addPOIs();
 
   const mid = Math.floor(routeCoords.length / 2);
   map.setView(routeCoords[mid], 13);
+}
+
+function addControlPoints() {
+  controlPointLayers.forEach(layer => map.removeLayer(layer));
+  controlPointLayers = [];
+
+  (ROUTE_DATA.controlPoints || []).forEach(point => {
+    const marker = L.marker([point.lat, point.lon], {
+      icon: L.divIcon({
+        className: 'control-point-marker',
+        html: `<span>${point.id}</span>`,
+        iconSize: [44, 22],
+        iconAnchor: [8, 11]
+      }),
+      zIndexOffset: 500
+    }).on('click', () => {
+      showInfo(
+        `<h3>📍 Ponto ${point.id}</h3>` +
+        `<p>Km ${point.km.toFixed(2)}</p>` +
+        `<p>${point.lat.toFixed(7)}, ${point.lon.toFixed(7)}</p>`
+      );
+    });
+    if (showControlPoints) marker.addTo(map);
+    controlPointLayers.push(marker);
+  });
+}
+
+function toggleControlPoints() {
+  showControlPoints = !showControlPoints;
+  document.getElementById('points-toggle-btn').classList.toggle('active', showControlPoints);
+  controlPointLayers.forEach(marker => {
+    if (showControlPoints) marker.addTo(map);
+    else map.removeLayer(marker);
+  });
 }
 
 function addKmMarkers() {

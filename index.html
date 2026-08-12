@@ -19,7 +19,7 @@
   <div class="loading-content">
     <img src="icon-192.png?v=2" alt="Carinhanha 2026" class="loading-logo">
     <h1>Carinhanha 2026</h1>
-    <p id="download-size">Baixando 9.441 imagens de satélite (~155 MB)...</p>
+    <p id="download-size">Baixando 9.892 imagens de satélite (~163 MB)...</p>
     <p style="font-size:13px; color:#666; margin-top:4px;">Mantenha a tela aberta até completar</p>
     <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
     <p id="progress-text">Conectando...</p>
@@ -49,6 +49,9 @@
 <div id="layer-column">
   <div id="km-toggle-btn" class="map-btn layer-btn" onclick="toggleKmDetail()">
     <span style="font-size:12px; font-weight:700; line-height:1">KM</span>
+  </div>
+  <div id="points-toggle-btn" class="map-btn layer-btn active" onclick="toggleControlPoints()">
+    <span style="font-size:10px; font-weight:700; line-height:1">PTS</span>
   </div>
   <div id="poi-toggle-btn" class="map-btn layer-btn" onclick="togglePOIDrawer()">
     <span style="line-height:1">📍</span>
@@ -90,6 +93,7 @@
 </div>
 
 <div id="coords-display" style="display:none"></div>
+<div id="map-attribution">River geometry © OpenStreetMap contributors</div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="route-data.js"></script>
