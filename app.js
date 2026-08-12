@@ -5,16 +5,10 @@ const ALL_POIS = [
   ...(ROUTE_DATA.pois || []),
   ...(typeof SHEET_POIS === 'undefined' ? [] : SHEET_POIS)
 ];
-let showAllKm = false;
-let kmLabelLayers = [];
-let kmDotLayers = [];
 let controlPointLayers = [];
-let showControlPoints = true;
 let savedNotes = [];
 let noteLayers = [];
 let speedSamples = [];
-let compassActive = false;
-let compassEventName = null;
 let lastNoteEditorOpenedAt = 0;
 let lastProgress = { loaded: 0, total: 0, timestamp: 0 };
 let stallTimer = null;
@@ -81,7 +75,6 @@ function initMap() {
     ).addTo(map);
   }
 
-  addKmMarkers();
   addControlPoints();
   addPOIs();
   loadSavedNotes();
@@ -111,71 +104,9 @@ function addControlPoints() {
         `<p>${point.lat.toFixed(7)}, ${point.lon.toFixed(7)}</p>`
       );
     });
-    if (showControlPoints) marker.addTo(map);
+    marker.addTo(map);
     controlPointLayers.push(marker);
   });
-}
-
-function toggleControlPoints() {
-  showControlPoints = !showControlPoints;
-  document.getElementById('points-toggle-btn').classList.toggle('active', showControlPoints);
-  controlPointLayers.forEach(marker => {
-    if (showControlPoints) marker.addTo(map);
-    else map.removeLayer(marker);
-  });
-}
-
-function addKmMarkers() {
-  kmLabelLayers.forEach(l => map.removeLayer(l));
-  kmDotLayers.forEach(l => map.removeLayer(l));
-  kmLabelLayers = [];
-  kmDotLayers = [];
-
-  ROUTE_DATA.kmMarkers.forEach(m => {
-    const isStart = m.km === 0;
-    const isEnd = Math.abs(m.km - TOTAL_KM) < 0.01;
-    const isMajor = m.km % 10 === 0;
-    const isMinor = m.km % 5 === 0;
-
-    const showLabel = showAllKm
-      ? true
-      : (isStart || isEnd || isMajor);
-
-    if (showLabel) {
-      const label = isStart ? 'INÍCIO' : isEnd ? 'FIM' : `${m.km} km`;
-      const fontSize = showAllKm ? (isMajor ? 13 : 10) : (isMajor ? 13 : 11);
-      const layer = L.marker([m.lat, m.lon], {
-        icon: L.divIcon({
-          className: 'km-marker-label',
-          html: `<span style="font-size:${fontSize}px">${label}</span>`,
-          iconSize: [60, 16],
-          iconAnchor: [30, 8]
-        })
-      }).addTo(map);
-      kmLabelLayers.push(layer);
-    }
-
-    const radius = showAllKm
-      ? (isMajor ? 4 : 2.5)
-      : (isMajor ? 4 : isMinor ? 2.5 : 1.5);
-    const opacity = showAllKm
-      ? (isMajor ? 0.9 : 0.7)
-      : (isMajor ? 0.9 : isMinor ? 0.6 : 0.3);
-
-    const dot = L.circleMarker([m.lat, m.lon], {
-      radius, fillColor: '#fff', fillOpacity: opacity,
-      color: '#fff', weight: 0.5, opacity
-    }).addTo(map).on('click', () => {
-      showInfo(`<h3>Km ${m.km}</h3><p>Restam ${(TOTAL_KM - m.km).toFixed(1)} km</p>`);
-    });
-    kmDotLayers.push(dot);
-  });
-}
-
-function toggleKmDetail() {
-  showAllKm = !showAllKm;
-  document.getElementById('km-toggle-btn').classList.toggle('active', showAllKm);
-  addKmMarkers();
 }
 
 const poiLayers = {};
@@ -329,7 +260,6 @@ function renderSavedNotes() {
     zIndexOffset: 800
   }).addTo(map).on('click', () => showNoteDetails(note.id)));
   document.getElementById('notes-count').textContent = savedNotes.length;
-  document.getElementById('notes-btn').classList.toggle('active', savedNotes.length > 0);
 }
 
 function setupNoteCreation() {
@@ -473,39 +403,6 @@ function updateSpeed(speedMetersPerSecond) {
   display.textContent = `${smoothed < 0.5 ? '0.0' : smoothed.toFixed(1)} km/h`;
 }
 
-function compassHeading(event) {
-  if (Number.isFinite(event.webkitCompassHeading)) return event.webkitCompassHeading;
-  if (Number.isFinite(event.alpha)) return (360 - event.alpha + 360) % 360;
-  return null;
-}
-
-function onCompass(event) {
-  const heading = compassHeading(event);
-  if (heading === null) return;
-  document.getElementById('compass-needle').style.transform = `rotate(${-heading}deg)`;
-  document.getElementById('compass-btn').classList.add('compass-live');
-}
-
-async function enableCompass() {
-  if (compassActive) return;
-  if (typeof DeviceOrientationEvent === 'undefined') {
-    showInfo('<h3>🧭 Bússola indisponível</h3><p>Este aparelho não oferece orientação pelo navegador. A rosa dos ventos continua indicando o norte do mapa.</p>');
-    return;
-  }
-  try {
-    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-      const permission = await DeviceOrientationEvent.requestPermission();
-      if (permission !== 'granted') throw new Error('permission-denied');
-    }
-    compassEventName = 'ondeviceorientationabsolute' in window ? 'deviceorientationabsolute' : 'deviceorientation';
-    window.addEventListener(compassEventName, onCompass, true);
-    compassActive = true;
-    document.getElementById('compass-btn').classList.add('active');
-  } catch (error) {
-    showInfo('<h3>🧭 Permissão necessária</h3><p>Permita o acesso aos sensores de movimento e orientação para ativar a bússola.</p>');
-  }
-}
-
 function findNearestPOI(lat, lon) {
   let minDist = Infinity, nearest = null;
   ALL_POIS.forEach(p => {
@@ -523,8 +420,7 @@ function toggleGPS() {
     document.getElementById('center-btn').style.display = 'none';
     document.getElementById('coords-display').style.display = 'none';
     if (userMarker) { map.removeLayer(userMarker); userMarker = null; }
-    document.getElementById('km-display').textContent = '-- km';
-    document.getElementById('remaining-display').textContent = 'Restam -- km';
+    document.getElementById('remaining-display').textContent = '-- km';
     document.getElementById('speed-display').textContent = '-- km/h';
     speedSamples = [];
     return;
@@ -566,8 +462,7 @@ function onPosition(pos) {
 
   const nearest = findNearestKm(lat, lon);
   if (nearest) {
-    document.getElementById('km-display').textContent = `${nearest.km.toFixed(1)} km`;
-    document.getElementById('remaining-display').textContent = `Restam ${(TOTAL_KM - nearest.km).toFixed(1)} km`;
+    document.getElementById('remaining-display').textContent = `${(TOTAL_KM - nearest.km).toFixed(1)} km`;
   }
 
   document.getElementById('coords-display').textContent =
