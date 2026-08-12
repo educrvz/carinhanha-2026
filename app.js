@@ -1,6 +1,10 @@
 let map, userMarker, watchId = null, autoCenter = true;
 let routeLine, altRouteLine;
 const TOTAL_KM = ROUTE_DATA.totalKm;
+const ALL_POIS = [
+  ...(ROUTE_DATA.pois || []),
+  ...(typeof SHEET_POIS === 'undefined' ? [] : SHEET_POIS)
+];
 let showAllKm = false;
 let kmLabelLayers = [];
 let kmDotLayers = [];
@@ -165,12 +169,12 @@ function toggleKmDetail() {
 }
 
 const poiLayers = {};
-const poiVisible = { beach: false, exit: false, bridge: false, island: false, town: false, house: false, lagoon: false, airstrip: false };
+const poiVisible = { beach: false, exit: false, bridge: false, island: false, town: false, house: false, lagoon: false, health: false, airstrip: false };
 
 function addPOIs() {
-  const emojis = { beach: '🏖️', bridge: '🌉', exit: '🚗', island: '🏝️', town: '🏘️', house: '🏠', lagoon: '💧', airstrip: '🛩️' };
+  const emojis = { beach: '🏖️', bridge: '🌉', exit: '🚗', island: '🏝️', town: '🏘️', house: '🏠', lagoon: '💧', health: '🏥', airstrip: '🛩️' };
 
-  ROUTE_DATA.pois.forEach(poi => {
+  ALL_POIS.forEach(poi => {
     const type = poi.type || 'beach';
     if (type === 'hospital') return;
     const emoji = emojis[type] || '📍';
@@ -188,6 +192,7 @@ function addPOIs() {
       if (poi.info) html += `<p style="font-size:24px; margin:8px 0">${poi.info}</p>`;
       if (poi.phone) html += `<p>📞 <a href="tel:${poi.phone.replace(/[^+\d]/g,'')}" style="color:#4af">${poi.phone}</a></p>`;
       if (!poi.phone) html += `<p>${poi.lat.toFixed(5)}, ${poi.lon.toFixed(5)}</p>`;
+      if (poi.sourceUrl) html += `<p><a href="${poi.sourceUrl}" target="_blank" rel="noopener" style="color:#4af">Fonte: ${poi.source}</a></p>`;
       showInfo(html);
     });
 
@@ -198,8 +203,8 @@ function addPOIs() {
 }
 
 function configureAvailableLayers() {
-  const nonHospitalPOIs = ROUTE_DATA.pois.filter(p => p.type !== 'hospital');
-  const hasHospitals = ROUTE_DATA.pois.some(p => p.type === 'hospital');
+  const nonHospitalPOIs = ALL_POIS.filter(p => p.type !== 'hospital');
+  const hasHospitals = ALL_POIS.some(p => p.type === 'hospital');
   if (nonHospitalPOIs.length === 0 && !hasHospitals) {
     document.getElementById('poi-toggle-btn').style.display = 'none';
   }
@@ -207,7 +212,7 @@ function configureAvailableLayers() {
     document.getElementById('hospital-btn').style.display = 'none';
   }
   Object.keys(poiVisible).forEach(type => {
-    if (!ROUTE_DATA.pois.some(p => p.type === type)) {
+    if (!ALL_POIS.some(p => p.type === type)) {
       const button = document.getElementById('toggle-' + type);
       if (button) button.style.display = 'none';
     }
@@ -230,7 +235,7 @@ function togglePOIDrawer() {
 }
 
 function showHospitals() {
-  const hospitals = ROUTE_DATA.pois.filter(p => p.type === 'hospital');
+  const hospitals = ALL_POIS.filter(p => p.type === 'hospital');
   let userLat = null, userLon = null;
   if (userMarker) {
     const ll = userMarker.getLatLng();

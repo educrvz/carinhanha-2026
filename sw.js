@@ -1,4 +1,4 @@
-const CACHE_NAME = 'carinhanha-v2';
+const CACHE_NAME = 'carinhanha-v3';
 
 const APP_SHELL = [
   './',
@@ -6,6 +6,7 @@ const APP_SHELL = [
   './app.js',
   './style.css',
   './route-data.js',
+  './poi-data.js',
   './tile-manifest.js',
   './manifest.json',
   './icon-192.png',
